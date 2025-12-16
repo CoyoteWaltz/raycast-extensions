@@ -51,6 +51,15 @@ export function buildUrl({ protocol, hostname, port, path, query, hash }: ParseR
   return urlParts.join("");
 }
 
+export function getItemId(item: ParseResult) {
+  return item.href + "#$#" + item.alias;
+}
+
+export function getItemIdFromId(id: string) {
+  const [href, alias] = id.split("#$#");
+  return { href, alias };
+}
+
 export function renderQrMarkdown(qr: string, url?: string) {
   const size = "330";
   return (

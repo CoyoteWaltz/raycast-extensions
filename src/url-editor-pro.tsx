@@ -3,18 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { getFavicon, useCachedState } from "@raycast/utils";
 import QRCode from "qrcode";
 import { EditUrlForm } from "./edit-url-form";
-import { ParseResult } from "./types";
-import { isURLLike, renderQrMarkdown } from "./utils";
+import { ParseResult, TemplateGroup } from "./types";
+import { isURLLike, renderQrMarkdown, getItemId, getItemIdFromId } from "./utils";
 import { TemplateManager } from "./template-manager";
-
-function getItemId(item: ParseResult) {
-  return item.href + "#$#" + item.alias;
-}
-
-function getItemIdFromId(id: string) {
-  const [href, alias] = id.split("#$#");
-  return { href, alias };
-}
+import { createVariantsView } from "./template-variants-helper";
+import { DEFAULT_TEMPLATE_GROUPS } from "./template-group-config";
 
 export default function Command() {
   const [history, setHistory] = useCachedState<ParseResult[]>("url-history", []);
@@ -23,6 +16,7 @@ export default function Command() {
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   const [filteredHistory, setFilteredHistory] = useState<ParseResult[]>(history);
   const [clipboardUrl, setClipboardUrl] = useState<string>("");
+  const [templateGroups] = useCachedState<TemplateGroup[]>("template-groups", DEFAULT_TEMPLATE_GROUPS);
 
   useEffect(() => {
     async function readClipboard() {
@@ -169,6 +163,14 @@ export default function Command() {
               />
             ) : null}
 
+            {isURLLike(input || clipboardUrl) && (
+              <Action.Push
+                title="Generate Variants"
+                icon={Icon.Bolt}
+                target={createVariantsView(input || clipboardUrl, templateGroups, handleSaveToHistory)}
+                shortcut={{ modifiers: ["cmd", "shift"], key: "v" }}
+              />
+            )}
             {history.length > 0 && (
               <Action
                 title="Clear History"
@@ -215,7 +217,14 @@ export default function Command() {
                 target={<EditUrlForm url={item} onSave={handleSaveToHistory} />}
               />
               <Action.CopyToClipboard content={item.href || ""} title="Copy URL" />
-
+              {item.href && (
+                <Action.Push
+                  title="Generate Variants"
+                  icon={Icon.Bolt}
+                  target={createVariantsView(item.href, templateGroups, handleSaveToHistory)}
+                  shortcut={{ modifiers: ["cmd", "shift"], key: "v" }}
+                />
+              )}
               <Action
                 icon={Icon.Trash}
                 style={Action.Style.Destructive}

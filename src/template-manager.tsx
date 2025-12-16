@@ -60,7 +60,7 @@ export function TemplateManager() {
       searchBarPlaceholder="Search template groups..."
       searchText={searchText}
       onSearchTextChange={setSearchText}
-      filtering={true}
+      filtering={false}
     >
       {filteredGroups.length === 0 ? (
         <List.EmptyView
