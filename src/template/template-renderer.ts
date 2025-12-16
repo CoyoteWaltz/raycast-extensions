@@ -20,10 +20,10 @@ function resolveVariable(variableName: string, modifiers: string[], context: Tem
       throw new Error("path:* should be handled by expander");
     }
 
-    // Handle {{path:N}}
-    const levelMatch = modifiers.find((m) => /^\d+$/.test(m) || m === "-1");
+    // Handle {{path:N}} - supports positive and negative integers
+    const levelMatch = modifiers.find((m) => /^-?\d+$/.test(m));
     if (levelMatch) {
-      const level = levelMatch === "-1" ? -1 : parseInt(levelMatch, 10);
+      const level = parseInt(levelMatch, 10);
       return getPathByLevel(context.pathSegments, level);
     }
 

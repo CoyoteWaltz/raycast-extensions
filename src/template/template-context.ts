@@ -42,12 +42,22 @@ function extractPathSegments(path: string): string[] {
 }
 
 export function getPathByLevel(segments: string[], level: number): string {
-  if (level === -1) {
-    // Return full path
-    return "/" + segments.join("/");
-  }
-  if (level <= 0 || level > segments.length) {
+  if (level === 0 || segments.length === 0) {
     return "/";
   }
+
+  // Handle negative indices (count from end, Python-style)
+  // -1 = full path, -2 = remove last 1, -3 = remove last 2, etc.
+  if (level < 0) {
+    const actualLevel = segments.length + level + 1;
+    if (actualLevel <= 0) return "/";
+    return "/" + segments.slice(0, actualLevel).join("/");
+  }
+
+  // Positive indices: take first N segments
+  if (level > segments.length) {
+    return "/" + segments.join("/"); // Return full path if level exceeds segments
+  }
+
   return "/" + segments.slice(0, level).join("/");
 }
