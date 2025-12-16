@@ -5,6 +5,7 @@ import QRCode from "qrcode";
 import { EditUrlForm } from "./edit-url-form";
 import { ParseResult } from "./types";
 import { isURLLike, renderQrMarkdown } from "./utils";
+import { TemplateManager } from "./template-manager";
 
 function getItemId(item: ParseResult) {
   return item.href + "#$#" + item.alias;
@@ -177,6 +178,14 @@ export default function Command() {
                 onAction={handleClear}
               />
             )}
+            <ActionPanel.Section title="VariantsTemplate">
+              <Action.Push
+                title="Manage Template"
+                icon={Icon.Gear}
+                target={<TemplateManager />}
+                shortcut={{ modifiers: ["ctrl", "shift"], key: "t" }}
+              />
+            </ActionPanel.Section>
           </ActionPanel>
         }
       />
