@@ -2,7 +2,7 @@ import { Action, ActionPanel, Detail } from "@raycast/api";
 import path from "path";
 import fs from "fs";
 import os from "os";
-import { showToast, Toast } from "@raycast/api";
+import { showToast, Toast, open } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
 import { ParseResult } from "./types";
 
