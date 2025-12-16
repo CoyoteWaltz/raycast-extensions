@@ -2,12 +2,13 @@ import { ActionPanel, Action, List, Icon, Keyboard, Clipboard, Image, Alert, con
 import { useEffect, useMemo, useState } from "react";
 import { getFavicon, useCachedState } from "@raycast/utils";
 import QRCode from "qrcode";
-import { EditUrlForm } from "./edit-url-form";
+import { EditUrlForm } from "./editor/edit-url-form";
 import { ParseResult, TemplateGroup } from "./types";
-import { isURLLike, renderQrMarkdown, getItemId, getItemIdFromId } from "./utils";
-import { TemplateManager } from "./template-manager";
-import { createVariantsView } from "./template-variants-helper";
-import { DEFAULT_TEMPLATE_GROUPS } from "./template-group-config";
+import { isURLLike, getItemId, getItemIdFromId } from "./utils";
+import { renderQrMarkdown } from "./qrcode";
+import { TemplateManager } from "./template/template-manager";
+import { createVariantsView } from "./template/template-variants-helper";
+import { DEFAULT_TEMPLATE_GROUPS } from "./template/template-group-config";
 
 export default function Command() {
   const [history, setHistory] = useCachedState<ParseResult[]>("url-history", []);

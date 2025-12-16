@@ -1,7 +1,7 @@
 import { ActionPanel, Action, List, Icon } from "@raycast/api";
-import { TemplateResult } from "./template/template-executor";
-import { EditUrlForm } from "./edit-url-form";
-import { ParseResult } from "./types";
+import { TemplateResult } from "./template-executor";
+import { EditUrlForm } from "../editor/edit-url-form";
+import { ParseResult } from "../types";
 
 interface TemplateVariantsViewProps {
   results: TemplateResult[];
@@ -16,19 +16,14 @@ export function TemplateVariantsView({ results, originalUrl, onSave }: TemplateV
       url,
       sourceTemplate: result.sourceTemplate,
       expansionInfo: result.expansionInfo,
-    }))
+    })),
   );
 
   // Deduplicate URLs
-  const uniqueUrls = Array.from(
-    new Map(allUrls.map((item) => [item.url, item])).values()
-  );
+  const uniqueUrls = Array.from(new Map(allUrls.map((item) => [item.url, item])).values());
 
   return (
-    <List
-      searchBarPlaceholder="Search generated URLs..."
-      navigationTitle="URL Variants"
-    >
+    <List searchBarPlaceholder="Search generated URLs..." navigationTitle="URL Variants">
       {uniqueUrls.length === 0 ? (
         <List.EmptyView
           icon={Icon.MagnifyingGlass}
@@ -70,4 +65,3 @@ export function TemplateVariantsView({ results, originalUrl, onSave }: TemplateV
     </List>
   );
 }
-

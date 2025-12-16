@@ -1,9 +1,10 @@
 import { Form, ActionPanel, Action, Icon, Keyboard, showToast, Toast, useNavigation } from "@raycast/api";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { QrDetail, buildUrl, parseUrl } from "./utils";
-import { ParseResult } from "./types";
 import { showFailureToast } from "@raycast/utils";
+import { buildUrl, parseUrl } from "../utils";
+import { QrDetail } from "../qrcode";
+import { ParseResult } from "../types";
 
 export function EditUrlForm({ url, onSave }: { url: ParseResult; onSave: (parsed: ParseResult) => void }) {
   const [fields, setFields] = useState<ParseResult | null>(null);

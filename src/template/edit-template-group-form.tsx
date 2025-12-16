@@ -1,6 +1,6 @@
 import { Form, ActionPanel, Action, Icon, Keyboard, showToast, Toast, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import { TemplateGroup } from "./types";
+import { TemplateGroup } from "../types";
 
 interface EditTemplateGroupFormProps {
   group?: TemplateGroup; // undefined for new group

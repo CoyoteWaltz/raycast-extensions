@@ -1,7 +1,7 @@
 import { ActionPanel, Action, List, Icon, Keyboard, Alert, confirmAlert, Color } from "@raycast/api";
 import { useState } from "react";
 import { useCachedState } from "@raycast/utils";
-import { TemplateGroup } from "./types";
+import { TemplateGroup } from "../types";
 import { EditTemplateGroupForm } from "./edit-template-group-form";
 import { DEFAULT_TEMPLATE_GROUPS } from "./template-group-config";
 

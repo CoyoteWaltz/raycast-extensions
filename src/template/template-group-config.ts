@@ -1,4 +1,4 @@
-import { TemplateGroup } from "./types";
+import { TemplateGroup } from "../types";
 
 export const DEFAULT_TEMPLATE_GROUPS: TemplateGroup[] = [
   {

@@ -1,7 +1,7 @@
 import { List, Icon } from "@raycast/api";
 import { useMemo } from "react";
-import { executeAllTemplateGroups, TemplateResult } from "./template/template-executor";
-import { TemplateGroup, ParseResult } from "./types";
+import { executeAllTemplateGroups, TemplateResult } from "./template-executor";
+import { TemplateGroup, ParseResult } from "../types";
 import { TemplateVariantsView } from "./template-variants-view";
 
 interface VariantsWrapperProps {
