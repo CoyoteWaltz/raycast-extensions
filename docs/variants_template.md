@@ -4,21 +4,21 @@
 
 The URL template system is designed to:
 
-* Allow users to generate URL variants **without entering an edit form**
-* Be fully **keyboard-driven**
-* Generate multiple URL variants **from the current page URL**
-* Display results as a **list** for quick selection
-* Support **query removal** and **path shortening**
-* Be powerful for advanced users, yet easy to understand
+- Allow users to generate URL variants **without entering an edit form**
+- Be fully **keyboard-driven**
+- Generate multiple URL variants **from the current page URL**
+- Display results as a **list** for quick selection
+- Support **query removal** and **path shortening**
+- Be powerful for advanced users, yet easy to understand
 
 ---
 
 ## Template Philosophy
 
-* Templates describe **what the URL looks like**
-* Expansion rules describe **how many URLs are generated**
-* The system favors **string templates** over DSLs
-* Complexity lives in the implementation, not in the user’s mental model
+- Templates describe **what the URL looks like**
+- Expansion rules describe **how many URLs are generated**
+- The system favors **string templates** over DSLs
+- Complexity lives in the implementation, not in the user's mental model
 
 ---
 
@@ -44,34 +44,48 @@ Example:
 
 ### URL Components
 
-| Variable       | Description                  |
-| -------------- | ---------------------------- |
-| `{{url}}`      | Original full URL            |
-| `{{protocol}}` | `http` / `https`             |
-| `{{host}}`     | Hostname (e.g. `github.com`) |
-| `{{hostname}}` | Alias of `host`              |
-| `{{port}}`     | Port number (if any)         |
-| `{{path}}`     | Full path without query      |
-| `{{query}}`    | Original query string        |
-| `{{hash}}`     | URL hash                     |
+| Variable       | Description                    | Example Output                   |
+| -------------- | ------------------------------ | -------------------------------- |
+| `{{url}}`      | Original full URL              | `https://github.com/raycast?a=1` |
+| `{{protocol}}` | `http` / `https`               | `https`                          |
+| `{{host}}`     | Hostname                       | `github.com`                     |
+| `{{hostname}}` | Alias of `host`                | `github.com`                     |
+| `{{port}}`     | Port number (empty if none)    | `8080`                           |
+| `{{path}}`     | Full path without query        | `/raycast/extensions`            |
+| `{{query}}`    | Query string (with `?` prefix) | `?tab=readme`                    |
+| `{{hash}}`     | URL hash (with `#` prefix)     | `#installation`                  |
 
 ---
 
-### Path Variables
+## Path Variables
 
-#### Path Segments
+### Path Segments
 
 ```
 /raycast/extensions/pull/22745
 → ["raycast", "extensions", "pull", "22745"]
 ```
 
-#### Path Level Selection
+### Path Level Selection (Positive Index)
+
+Use `{{path:N}}` to get the first N path segments:
 
 ```
 {{path:1}}    → /raycast
 {{path:2}}    → /raycast/extensions
-{{path:-1}}   → full path
+{{path:3}}    → /raycast/extensions/pull
+{{path:4}}    → /raycast/extensions/pull/22745
+```
+
+### Path Level Selection (Negative Index - Python-style)
+
+Use `{{path:-N}}` to remove segments from the end:
+
+```
+{{path:-1}}   → /raycast/extensions/pull/22745  (full path)
+{{path:-2}}   → /raycast/extensions/pull        (remove last 1)
+{{path:-3}}   → /raycast/extensions             (remove last 2)
+{{path:-4}}   → /raycast                        (remove last 3)
 ```
 
 ---
@@ -86,9 +100,9 @@ Example:
 
 **Behavior**
 
-* Expands from the first path segment to the full path
-* Path depth is detected dynamically
-* Generates one URL per level
+- Expands from the first path segment to the full path
+- Path depth is detected dynamically
+- Generates one URL per level
 
 **Example**
 
@@ -113,9 +127,10 @@ https://github.com/raycast/extensions/pull/22745
 
 ### Default Behavior
 
-* `{{path}}` **does not include query parameters**
+- `{{path}}` **does not include query parameters**
+- `{{query}}` includes the `?` prefix only when parameters exist
 
-### Explicit Control (Optional / Roadmap)
+### Future Extensions (Roadmap)
 
 ```
 {{path+query}}          // keep query
@@ -127,78 +142,124 @@ https://github.com/raycast/extensions/pull/22745
 
 ## Template Groups
 
-Templates are designed to be used in **groups** and triggered via keyboard shortcuts.
+Templates are organized into **groups** for better management.
 
-```json
-{
-  "name": "Shorten URL",
-  "trigger": "⌘S",
-  "templates": [
-    "{{protocol}}://{{host}}",
-    "{{protocol}}://{{host}}{{path:*}}"
-  ]
+### Data Structure
+
+```typescript
+interface TemplateGroup {
+  id: string;
+  name: string;
+  description?: string;
+  templates: string[];
+  enabled?: boolean;
 }
 ```
 
-**User Flow**
+### Default Template Groups
 
-1. Copy or input URL
-2. Trigger template group via shortcut
+| Name                    | Description                        | Templates                                                              |
+| ----------------------- | ---------------------------------- | ---------------------------------------------------------------------- |
+| Shorten URL             | Generate shortened URL variants    | `{{protocol}}://{{host}}`, `{{protocol}}://{{host}}{{path:*}}`         |
+| Remove Query Parameters | Generate URLs without query params | `{{protocol}}://{{host}}{{path}}`, `{{protocol}}://{{host}}{{path:*}}` |
+| Path Hierarchy          | Show all path levels               | `{{protocol}}://{{host}}{{path:*}}`                                    |
+
+---
+
+## Keyboard Shortcuts
+
+| Action                | Shortcut |
+| --------------------- | -------- |
+| Generate Variants     | `⌘⇧V`    |
+| Manage Templates      | `⌃⇧T`    |
+| Copy URL (in results) | `Enter`  |
+
+---
+
+## User Flow
+
+1. Copy or input URL in the main interface
+2. Press `⌘⇧V` to generate URL variants
 3. Navigate generated list with arrow keys
-4. Press Enter to copy
+4. Press `Enter` to copy selected URL
+5. (Optional) Press `⌃⇧T` to manage template groups
 
 ---
 
-## UI / UX Recommendations
+## UI / UX
 
-* Display generated URLs in a Raycast list
-* Show only the shortened path in the title
-* Optional subtitle:
+- Display generated URLs in a Raycast list
+- Show group name and template info in subtitle:
 
 ```
-Generated from path hierarchy (4 levels)
+Path Hierarchy · path hierarchy (4 levels)
+Shorten URL · {{protocol}}://{{host}}
 ```
 
-This makes expansion behavior transparent to users.
+- Deduplicate URLs across all template groups
 
 ---
 
-## Implementation Notes
+## Implementation Architecture
+
+### Module Structure
+
+```
+src/template/
+├── template-context.ts      # Build context from URL
+├── template-parser.ts       # Parse {{variable}} syntax
+├── template-renderer.ts     # Render templates, handle expansion
+├── template-executor.ts     # Execute template groups
+├── template-manager.tsx     # UI for managing groups
+├── template-group-config.ts # Default template groups
+├── template-variants-view.tsx   # Display results
+└── template-variants-helper.tsx # Helper for lazy loading
+```
 
 ### Parsing Flow
 
 1. Parse URL using `new URL(input)`
-2. Split path into segments
-3. Build template context
-4. Detect expansion variables (`*`)
-5. Render and expand templates
-6. Deduplicate results
-7. Render list
+2. Split path into segments (decode URI components)
+3. Build template context with all variables
+4. Parse template string into tokens
+5. Detect expansion variables (`*`)
+6. Render and expand templates
+7. Deduplicate results
+8. Display in list view
 
 ### Template Output Type
 
 ```ts
-type TemplateResult = string | string[];
+type TemplateResult = {
+  urls: string[];
+  sourceTemplate: string;
+  groupName: string;
+  expansionInfo?: {
+    type: "path-hierarchy";
+    levels: number;
+  };
+};
 ```
 
 ---
 
 ## Why This Design Works
 
-* No DSL or scripting required
-* Low cognitive load for users
-* Powerful enough for advanced workflows
-* Easy to extend in future versions
-* Perfectly aligned with Raycast’s keyboard-first UX
+- No DSL or scripting required
+- Low cognitive load for users
+- Powerful enough for advanced workflows
+- Easy to extend in future versions
+- Perfectly aligned with Raycast's keyboard-first UX
 
 ---
 
 ## Future Extensions (Optional)
 
-* Range expansion: `{{path:1..*}}`
-* Filters: `{{path:* | max(3)}}`
-* Domain-aware variables (e.g. GitHub repo paths)
-* Custom user-defined variables
+- Range expansion: `{{path:1..*}}`
+- Filters: `{{path:* | max(3)}}`
+- Domain-aware variables (e.g. GitHub repo paths)
+- Custom user-defined variables
+- Query parameter whitelist/blacklist
 
 ---
 

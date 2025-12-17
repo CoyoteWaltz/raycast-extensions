@@ -110,6 +110,7 @@ export function TemplateManager() {
                         <List.Item.Detail.Metadata.Separator />
                       </>
                     )}
+                    
                     <List.Item.Detail.Metadata.Label
                       title="Status"
                       text={group.enabled !== false ? "Enabled" : "Disabled"}
