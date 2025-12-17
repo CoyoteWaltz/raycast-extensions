@@ -6,6 +6,7 @@ import { parseUrl } from "../utils";
 export interface TemplateResult {
   urls: string[];
   sourceTemplate: string;
+  groupName: string;
   expansionInfo?: {
     type: "path-hierarchy";
     levels: number;
@@ -28,6 +29,7 @@ export function executeTemplateGroup(group: TemplateGroup, url: string): Templat
     results.push({
       urls,
       sourceTemplate: template,
+      groupName: group.name,
       expansionInfo: Array.isArray(rendered)
         ? {
             type: "path-hierarchy",

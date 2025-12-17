@@ -9,6 +9,7 @@ import { renderQrMarkdown } from "./qrcode";
 import { TemplateManager } from "./template/template-manager";
 import { createVariantsView } from "./template/template-variants-helper";
 import { DEFAULT_TEMPLATE_GROUPS } from "./template/template-group-config";
+import { WELCOME_BRIEF, CLIPBOARD_DETECTED_BRIEF, URL_INPUT_BRIEF } from "./brief";
 
 export default function Command() {
   const [history, setHistory] = useCachedState<ParseResult[]>("url-history", []);
@@ -105,6 +106,19 @@ export default function Command() {
     return undefined;
   }, [history, input, clipboardUrl]);
 
+  const templateEntryAction = useMemo(() => {
+    return (
+      <ActionPanel.Section title="Template">
+        <Action.Push
+          title="Manage Template"
+          icon={Icon.Gear}
+          target={<TemplateManager />}
+          shortcut={{ modifiers: ["ctrl", "shift"], key: "t" }}
+        />
+      </ActionPanel.Section>
+    );
+  }, []);
+
   return (
     <List
       searchBarPlaceholder="Paste or type your URL..."
@@ -126,10 +140,10 @@ export default function Command() {
           <List.Item.Detail
             markdown={
               showClipboardUrl
-                ? `URL detected in clipboard:\n\n\`\`\`\n${clipboardUrl}\n\`\`\`\n\n**Press Enter to paste and parse**`
+                ? CLIPBOARD_DETECTED_BRIEF(clipboardUrl)
                 : isURLLike(input)
-                  ? `**Press Enter to parse and Edit** \n\n \`\`\`\n${input}\n\`\`\``
-                  : "Enter URL to parse and edit"
+                  ? URL_INPUT_BRIEF(input)
+                  : WELCOME_BRIEF
             }
           />
         }
@@ -181,14 +195,7 @@ export default function Command() {
                 onAction={handleClear}
               />
             )}
-            <ActionPanel.Section title="VariantsTemplate">
-              <Action.Push
-                title="Manage Template"
-                icon={Icon.Gear}
-                target={<TemplateManager />}
-                shortcut={{ modifiers: ["ctrl", "shift"], key: "t" }}
-              />
-            </ActionPanel.Section>
+            {templateEntryAction}
           </ActionPanel>
         }
       />
@@ -233,6 +240,7 @@ export default function Command() {
                 title="Delete from History"
                 onAction={() => handleDeleteFromHistory(getItemId(item))}
               />
+              {templateEntryAction}
             </ActionPanel>
           }
         />

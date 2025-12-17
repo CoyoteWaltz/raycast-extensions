@@ -142,13 +142,19 @@ export function TemplateManager() {
                   title={group.enabled !== false ? "Disable" : "Enable"}
                   icon={group.enabled !== false ? Icon.EyeDisabled : Icon.Eye}
                   onAction={() => handleToggleEnabled(group.id)}
-                  shortcut={{ modifiers: ["cmd"], key: "e" }}
+                  shortcut={{ modifiers: ["cmd", "shift"], key: "e" }}
                 />
                 <Action
                   title="Duplicate"
                   icon={Icon.CopyClipboard}
                   onAction={() => handleDuplicate(group)}
                   shortcut={{ modifiers: ["cmd"], key: "d" }}
+                />
+                <Action.Push
+                  title="Create New Template Group"
+                  icon={Icon.Plus}
+                  target={<EditTemplateGroupForm onSave={setTemplateGroups} existingGroups={templateGroups} />}
+                  shortcut={Keyboard.Shortcut.Common.New}
                 />
                 <Action
                   title="Delete Template Group"
@@ -157,14 +163,6 @@ export function TemplateManager() {
                   onAction={() => handleDelete(group.id)}
                   shortcut={Keyboard.Shortcut.Common.Remove}
                 />
-                <ActionPanel.Section>
-                  <Action.Push
-                    title="Create New Template Group"
-                    icon={Icon.Plus}
-                    target={<EditTemplateGroupForm onSave={setTemplateGroups} existingGroups={templateGroups} />}
-                    shortcut={Keyboard.Shortcut.Common.New}
-                  />
-                </ActionPanel.Section>
               </ActionPanel>
             }
           />

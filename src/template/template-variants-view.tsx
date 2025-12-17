@@ -15,6 +15,7 @@ export function TemplateVariantsView({ results, originalUrl, onSave }: TemplateV
     result.urls.map((url) => ({
       url,
       sourceTemplate: result.sourceTemplate,
+      groupName: result.groupName,
       expansionInfo: result.expansionInfo,
     })),
   );
@@ -38,8 +39,8 @@ export function TemplateVariantsView({ results, originalUrl, onSave }: TemplateV
             title={item.url}
             subtitle={
               item.expansionInfo
-                ? `Generated from path hierarchy (${item.expansionInfo.levels} levels)`
-                : `From template: ${item.sourceTemplate}`
+                ? `${item.groupName} · path hierarchy (${item.expansionInfo.levels} levels)`
+                : `${item.groupName} · ${item.sourceTemplate}`
             }
             icon={Icon.Link}
             actions={

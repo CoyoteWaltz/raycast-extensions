@@ -198,14 +198,16 @@ export function EditTemplateGroupForm({ group, onSave, existingGroups }: EditTem
         label="Enabled"
         value={enabled}
         onChange={setEnabled}
-        info="Disabled template groups won't appear in the action panel"
+        info="Disabled template groups won't be used when generating URL variants"
       />
 
       <Form.Separator />
 
       <Form.Description
         title="Templates"
-        text="Define one or more URL templates. Use {{variable}} syntax. Use {{path:*}} for path hierarchy expansion."
+        text={`Variables: {{url}}, {{protocol}}, {{host}}, {{path}}, {{query}}, {{hash}}, {{port}}
+
+Path modifiers: {{path:N}} (first N), {{path:-N}} (remove last), {{path:*}} (expand all levels)`}
       />
 
       {templates.map((template, index) => (
